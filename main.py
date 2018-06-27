@@ -6,7 +6,7 @@ import csv
 import gzip
 import json
 
-in_filename = "uprightRevenge14d-20180625-232147.json.gzip" #Name of input file
+in_filename = "uprightRevenge14d-20180625-232147.json.gz" #Name of input file
 out_filename = "output_table.csv" #Name of output file
 
 with gzip.open(in_filename, "rb") as f:
