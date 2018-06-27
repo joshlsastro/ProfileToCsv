@@ -19,7 +19,7 @@ shards = all_json["profile"]["shards"]
 def get_info_from_row(number_of_shard):
     """Returns id, the searches' query time in nanos, and the aggregations' time in nanos for a shard given its number."""
     global shards
-    shard = shards[0]
+    shard = shards[number_of_shard]
     what = shard['id']
     searches = shard['searches']
     agg = shard['aggregations']
