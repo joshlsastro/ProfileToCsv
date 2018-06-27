@@ -2,12 +2,18 @@
 """This code takes JSON from a gzip'd input file and writes an output CSV file.
 Consult the README for details."""
 
-import csv
+import argparse
 import gzip
 import json
 
-in_filename = "uprightRevenge14d-20180625-232147.json.gz" #Name of input file
-out_filename = "output_table.csv" #Name of output file
+parser = argparse.ArgumentParser(description = "Converts gzip'd JSON file to more useful JSON format.")
+parser.add_argument("-o", help = "Output file.")
+parser.add_argument("in_file", help="Input .json.gz file.")
+args = parser.parse_args()
+if args.in_file:
+    args = vars(args)
+    in_filename = args['in_file']
+    out_filename = args['o']
 
 with gzip.open(in_filename, "rb") as f:
     text = f.read()
@@ -27,13 +33,29 @@ def get_info_from_row(number_of_shard):
     agg_time_in_nanos = agg[0]['time_in_nanos']
     return what, searches_time_in_nanos, agg_time_in_nanos
 
-outputList = []
+def parse_id(what):
+    """Parses ID. Returns index and the rest of the ID."""
+    what = what.split("][")
+    index = what[1]
+    rest = what[0] + "][" + what[2]
+    return index, rest
+
+l_output = []
 for i in range(len(shards)):
     what, s_time, a_time = get_info_from_row(i)
-    outputList.append([what, s_time, a_time])
+    index, what = parse_id(what)
+    l_output.append([index, what, s_time, a_time])
 
+output = {}
+for elem in l_output:
+    index = elem[0]
+    keys = output.keys()
+    if index in keys:
+        pass
+    else:
+        output[index] = []
+    output[index].append([elem[1], elem[2], elem[3]])
+
+output = json.dumps(output)
 with open(out_filename, "w") as f:
-    writer = csv.writer(f, delimiter = "!")
-    for row in outputList:
-        writer.writerow(row)
-
+    f.write(output)
